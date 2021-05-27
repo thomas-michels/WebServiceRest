@@ -10,7 +10,7 @@ class Film(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
     year = Column(Integer)
-    characters_id = Column(Integer, ForeignKey('actors.id'), use_list=True)
+    roster = Column(Integer, ForeignKey('actors.id'), use_list=True)
     is_active = Column(Boolean, default=True)
 
-    character = relationship('Actor', back_populates="films")
+    actor = relationship('Actor', secondary='acting')

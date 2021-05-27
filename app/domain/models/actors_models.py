@@ -9,7 +9,8 @@ class Actor(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
+    password = Column(String)
     age = Column(Integer)
     is_active = Column(Boolean, default=True)
 
-    films = relationship("Film", back_populates="character")
+    film = relationship('Film', secondary='acting')
