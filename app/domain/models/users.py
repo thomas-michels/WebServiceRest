@@ -19,8 +19,5 @@ class User(Base):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'password': self.password,
-            'created_date': self.created_date,
-            'updated_date': self.updated_date,
-            'active': self.active
+            'password': self.password
         }
