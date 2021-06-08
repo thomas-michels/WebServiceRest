@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from settings import PROJECT_NAME, BACKEND_CORS_ORIGINS
 from starlette.middleware.cors import CORSMiddleware
 from app.domain import api_router
-from app.domain.models import users
-from database import engine, SessionLocal
+from app.domain.models import users, sales, orders, products
+from database import engine
 from starlette.responses import RedirectResponse
 
 users.Base.metadata.create_all(bind=engine)
+sales.Base.metadata.create_all(bind=engine)
+orders.Base.metadata.create_all(bind=engine)
+products.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=PROJECT_NAME)
 
