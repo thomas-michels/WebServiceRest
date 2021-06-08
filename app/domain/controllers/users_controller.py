@@ -2,6 +2,9 @@
 from sqlalchemy.orm import Session
 from app.domain.models.users import User
 from typing import List
+from app.domain.controllers.base_controller import get as base_get, \
+                                                    get_by_id as base_get_by_id,\
+                                                    delete as base_delete
 
 
 def create(db: Session, data: dict) -> User:
@@ -15,11 +18,11 @@ def create(db: Session, data: dict) -> User:
 
 
 def get(db: Session) -> List[User]:
-    return db.query(User).all()
+    return base_get(db, User)
 
 
 def get_by_id(db: Session, id: str) -> User:
-    return db.query(User).get(id)
+    return base_get_by_id(db, User, id)
 
 
 def update(db: Session, id: str, data: dict) -> User:
@@ -32,7 +35,4 @@ def update(db: Session, id: str, data: dict) -> User:
 
 
 def delete(db: Session, id: str) -> User:
-    user = get_by_id(db, id)
-    user.active = False
-    db.commit()
-    return user
+    return base_delete(db, User, id)
