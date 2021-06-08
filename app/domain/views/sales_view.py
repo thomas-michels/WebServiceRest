@@ -26,8 +26,8 @@ async def get_sale(id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=Sale, tags=['sales'])
-async def create_sale(data: dict, db: Session = Depends(get_db)):
-    return JSONResponse(sale_create(db, data).serialize())
+async def create_sale(db: Session = Depends(get_db)):
+    return JSONResponse(sale_create(db).serialize())
 
 
 @router.put("/{id}", response_model=Sale, tags=['sales'])

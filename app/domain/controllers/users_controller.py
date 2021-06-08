@@ -1,5 +1,6 @@
 
 from sqlalchemy.orm import Session
+from datetime import datetime
 from app.domain.models.users import User
 from typing import List
 from app.domain.controllers.base_controller import get as base_get, \
@@ -30,9 +31,13 @@ def update(db: Session, id: str, data: dict) -> User:
     user.name = data.get('name') if data.get('name') else user.name
     user.email = data.get('email') if data.get('email') else user.email
     user.password = data.get('password') if data.get('password') else user.password
+    user.updated_date = datetime.now()
     db.commit()
     return user
 
 
 def delete(db: Session, id: str) -> User:
-    return base_delete(db, User, id)
+    user = base_delete(db, User, id)
+    user.updated_date = datetime.now()
+    db.commit()
+    return user
