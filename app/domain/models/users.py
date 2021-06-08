@@ -2,11 +2,12 @@
 from datetime import datetime
 from sqlalchemy import Column, String, DateTime, Boolean
 from database import Base
+from uuid import uuid4
 
 
 class User(Base):
     __tablename__ = 'users'
-    id = Column(String, primary_key=True)
+    id = Column(String, default=lambda: str(uuid4()),primary_key=True)
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
@@ -19,5 +20,6 @@ class User(Base):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'password': self.password
+            'password': self.password,
+            'active': self.active
         }
