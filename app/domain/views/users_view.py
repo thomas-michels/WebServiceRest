@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from app.domain.schemas.users_schemas import User
+from app.domain.controllers.types_controller import create_all_types
 from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
@@ -27,6 +28,7 @@ async def get_user(id: str, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=User, tags=['users'])
 async def create_user(data: dict, db: Session = Depends(get_db)):
+    create_all_types(db)
     return JSONResponse(user_create(db, data).serialize())
 
 

@@ -10,6 +10,7 @@ class User(BaseModel):
     created_date: datetime
     updated_date: datetime
     active: bool
+    user_type_id: int
 
     class Config:
         orm_mode = True
