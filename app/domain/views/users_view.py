@@ -10,7 +10,9 @@ from app.domain.controllers.users_controller import get as user_get, \
                                                            create as user_create, \
                                                            get_by_id as user_get_by_id, \
                                                            update as user_update, \
-                                                           delete as user_delete
+                                                           delete as user_delete, \
+                                                           get_by_email as user_get_email, \
+                                                           get_by_name as user_get_name
 
 router = APIRouter()
 
@@ -24,6 +26,16 @@ async def get_users(db: Session = Depends(get_db)):
 @router.get("/{id}", response_model=User, tags=['users'])
 async def get_user(id: str, db: Session = Depends(get_db)):
     return JSONResponse(user_get_by_id(db, id).serialize())
+
+
+@router.get("/email/", response_model=User, tags=['users'])
+async def get_user_by_email(email: str, db: Session = Depends(get_db)):
+    return JSONResponse(user_get_email(db, email).serialize())
+
+
+@router.get("/name/", response_model=User, tags=['users'])
+async def get_user_by_name(name: str, db: Session = Depends(get_db)):
+    return JSONResponse(user_get_name(db, name).serialize())
 
 
 @router.post("/", response_model=User, tags=['users'])

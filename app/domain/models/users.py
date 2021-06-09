@@ -28,7 +28,6 @@ class User(Base):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'password': self.password,
             'user_type': self.user_type.serialize(),
             'active': self.active
         }
