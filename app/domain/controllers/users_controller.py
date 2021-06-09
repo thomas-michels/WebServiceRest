@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from werkzeug.security import generate_password_hash
 from app.domain.models.users import User
+from utils.token import encode
 from typing import List
 from app.domain.controllers.base_controller import get as base_get, \
                                                     get_by_id as base_get_by_id,\
@@ -50,3 +51,13 @@ def delete(db: Session, id: str) -> User:
     user.updated_date = datetime.now()
     db.commit()
     return user
+
+
+def login(db: Session, data: dict):
+    email = data.get('email')
+    password = data.get('password')
+    user = get_by_email(db, email)
+    if user:
+        if user.active:
+            if user.verify_password(password):
+                return encode(user.serialize())
