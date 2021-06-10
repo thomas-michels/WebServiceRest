@@ -60,4 +60,4 @@ def login(db: Session, data: dict):
     if user:
         if user.active:
             if user.verify_password(password):
-                return encode(user.serialize())
+                return encode(user.serialize_token())

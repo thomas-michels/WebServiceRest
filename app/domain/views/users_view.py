@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Depends, Security, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
-from app.domain.schemas.token_schema import Token
 from app.domain.schemas.users_schemas import User
 from fastapi.security import OAuth2PasswordBearer
 from app.domain.controllers.types_controller import create_all_types
@@ -11,21 +10,22 @@ from sqlalchemy.orm import Session
 from database import get_db
 from app.domain.services import authorization
 from app.domain.controllers.users_controller import get as user_get, \
-                                                           create as user_create, \
-                                                           get_by_id as user_get_by_id, \
-                                                           update as user_update, \
-                                                           delete as user_delete, \
-                                                           get_by_email as user_get_email, \
-                                                           get_by_name as user_get_name, \
-                                                           login
+    create as user_create, \
+    get_by_id as user_get_by_id, \
+    update as user_update, \
+    delete as user_delete, \
+    get_by_email as user_get_email, \
+    get_by_name as user_get_name
+from settings import SALESMAN, ADMIN
 
 router = APIRouter()
-token_check = OAuth2PasswordBearer(tokenUrl='/')
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/')
 
 
 @router.get("/", response_model=List[User], tags=['users'])
-async def get_users(db: Session = Depends(get_db), token: str = Security(token_check)):
-    authorization.check_authorization(token)
+async def get_users(db: Session = Depends(get_db), token = Security(oauth2_scheme)):
+    authorization.check_authorization(token, [SALESMAN, ADMIN])
     json = jsonable_encoder(user_get(db))
     return JSONResponse(json)
 
@@ -59,10 +59,3 @@ async def update_user(id: str, data: dict, db: Session = Depends(get_db)):
 @router.delete("/{id}", response_model=User, tags=['users'])
 async def delete_user(id: str, db: Session = Depends(get_db)):
     return JSONResponse(user_delete(db, id).serialize())
-
-
-@router.post("/login", tags=['login'])
-def login_user(data: dict, db: Session = Depends(get_db)):
-    log = login(db, data)
-    json = jsonable_encoder(log)
-    return JSONResponse(json)

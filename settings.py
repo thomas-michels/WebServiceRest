@@ -14,3 +14,6 @@ HOST = 'localhost'
 PORT = 5000
 RELOAD = True
 BACKEND_CORS_ORIGINS = []
+CLIENT = 'client'
+SALESMAN = 'salesman'
+ADMIN = 'admin'
