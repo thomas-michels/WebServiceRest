@@ -13,32 +13,37 @@ from app.domain.controllers.products_controller import get as product_get, \
                                                            get_by_id as product_get_by_id, \
                                                            update as product_update, \
                                                            delete as product_delete
+from utils.contants import ROUTE_DELETE, ROUTE_UPDATE, ROUTE_CREATE, ROUTE_GET
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[Product], tags=['products'])
-async def get_products(db: Session = Depends(get_db)):
+async def get_products(db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     json = jsonable_encoder(product_get(db))
     return JSONResponse(json)
 
 
 @router.get("/{id}", response_model=Product, tags=['products'])
-async def get_product(id: str, db: Session = Depends(get_db)):
+async def get_product(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     return JSONResponse(product_get_by_id(db, id).serialize())
 
 
 @router.post("/", response_model=Product, tags=['products'])
-async def create_product(data: dict, db: Session = Depends(get_db)):
+async def create_product(data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_CREATE)
     return JSONResponse(product_create(db, data).serialize())
 
 
 @router.put("/{id}", response_model=Product, tags=['products'])
-async def update_product(id: str, data: dict, db: Session = Depends(get_db)):
+async def update_product(id: str, data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_UPDATE)
     return JSONResponse(product_update(db, id, data).serialize())
 
 
 @router.delete("/{id}", response_model=Product, tags=['products'])
 async def delete_product(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(token, [ADMIN])
+    authorization.check_authorization(db, token, route_type=ROUTE_DELETE)
     return JSONResponse(product_delete(db, id).serialize())

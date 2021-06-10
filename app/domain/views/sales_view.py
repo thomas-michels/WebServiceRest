@@ -13,32 +13,37 @@ from app.domain.controllers.sales_controller import get as sale_get, \
                                                    get_by_id as sale_get_by_id, \
                                                    update as sale_update, \
                                                    delete as sale_delete
+from utils.contants import ROUTE_DELETE, ROUTE_UPDATE, ROUTE_GET, ROUTE_CREATE
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[Sale], tags=['sales'])
-async def get_sales(db: Session = Depends(get_db)):
+async def get_sales(db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     json = jsonable_encoder(sale_get(db))
     return JSONResponse(json)
 
 
 @router.get("/{id}", response_model=Sale, tags=['sales'])
-async def get_sale(id: str, db: Session = Depends(get_db)):
+async def get_sale(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     return JSONResponse(sale_get_by_id(db, id).serialize())
 
 
 @router.post("/", response_model=Sale, tags=['sales'])
-async def create_sale(db: Session = Depends(get_db)):
+async def create_sale(db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_CREATE)
     return JSONResponse(sale_create(db).serialize())
 
 
 @router.put("/{id}", response_model=Sale, tags=['sales'])
-async def update_sale(id: str, data: dict, db: Session = Depends(get_db)):
+async def update_sale(id: str, data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_UPDATE)
     return JSONResponse(sale_update(db, id, data).serialize())
 
 
 @router.delete("/{id}", response_model=Sale, tags=['sales'])
 async def delete_sale(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(token, [ADMIN])
+    authorization.check_authorization(db, token, route_type=ROUTE_DELETE)
     return JSONResponse(sale_delete(db, id).serialize())
