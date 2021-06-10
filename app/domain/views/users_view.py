@@ -12,7 +12,7 @@ from app.domain.services.security import OAUTH2
 from database import get_db
 from app.domain.services import authorization
 from app.exceptions import UnprocessableEntityException
-from utils.contants import ROUTE_UPDATE, ROUTE_DELETE
+from utils.contants import ROUTE_UPDATE, ROUTE_DELETE, ROUTE_CREATE, ROUTE_GET
 from app.domain.controllers.users_controller import get as user_get, \
     create as user_create, \
     get_by_id as user_get_by_id, \
@@ -26,32 +26,42 @@ router = APIRouter()
 
 @router.get("/", response_model=List[User], tags=['users'])
 async def get_users(db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token)
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     json = jsonable_encoder(user_get(db))
     return JSONResponse(json)
 
 
 @router.get("/{id}", response_model=User, tags=['users'])
 async def get_user(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token)
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     return JSONResponse(user_get_by_id(db, id).serialize())
 
 
 @router.get("/email/", response_model=User, tags=['users'])
 async def get_user_by_email(email: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token)
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
     return JSONResponse(user_get_email(db, email).serialize())
 
 
 @router.get("/name/", response_model=User, tags=['users'])
 async def get_user_by_name(name: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, name=name)
+    authorization.check_authorization(db, token, name=name, route_type=ROUTE_GET)
     return JSONResponse(user_get_name(db, name).serialize())
 
 
 @router.post("/", response_model=User, tags=['users'])
 async def create_user(data: dict, db: Session = Depends(get_db)):
     create_all_types(db)
+    try:
+        return JSONResponse(user_create(db, data).serialize())
+
+    except IntegrityError as e:
+        raise UnprocessableEntityException(e.args[0])
+
+
+@router.post("/salesman", response_model=User, tags=['users'])
+async def create_salesman(data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_CREATE)
     try:
         return JSONResponse(user_create(db, data).serialize())
 
