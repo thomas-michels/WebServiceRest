@@ -28,3 +28,14 @@ class InternalServerErrorException(HTTPException):
     def __init__(self, message: str = "Internal Server Error Exception"):
         code = 500
         super().__init__(code, message)
+
+
+class UnprocessableEntityException(HTTPException):
+    def __init__(self, message: str = "Unprocessable Entity Exception"):
+        code = 422
+        super().__init__(code, message)
+
+
+class InvalidToken(UnprocessableEntityException):
+    def __init__(self, message: str = "Invalid token"):
+        super().__init__(message)

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from app.exceptions import NotFoundException
 from app.domain import models
 
 
@@ -8,7 +8,11 @@ def get(db: Session, model: models):
 
 
 def get_by_id(db: Session, model: models, id: str):
-    return db.query(model).get(id)
+    entity = db.query(model).get(id)
+    if entity:
+        return entity
+
+    raise NotFoundException()
 
 
 def delete(db: Session, model: models, id: str):

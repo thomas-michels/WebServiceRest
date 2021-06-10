@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from app.domain.schemas.sales_schemas import Sale
 from typing import List
 from sqlalchemy.orm import Session
+
+from app.domain.services import authorization
+from app.domain.services.security import OAUTH2
 from database import get_db
 from app.domain.controllers.sales_controller import get as sale_get, \
                                                    create as sale_create, \
@@ -36,5 +39,6 @@ async def update_sale(id: str, data: dict, db: Session = Depends(get_db)):
 
 
 @router.delete("/{id}", response_model=Sale, tags=['sales'])
-async def delete_sale(id: str, db: Session = Depends(get_db)):
+async def delete_sale(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(token, [ADMIN])
     return JSONResponse(sale_delete(db, id).serialize())

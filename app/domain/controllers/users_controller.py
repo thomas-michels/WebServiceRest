@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash
 from app.domain.models.users import User
 from utils.token import encode
 from typing import List
+from app.exceptions import UnauthorizedException, NotFoundException
 from app.domain.controllers.base_controller import get as base_get, \
                                                     get_by_id as base_get_by_id,\
                                                     delete as base_delete
@@ -60,4 +61,12 @@ def login(db: Session, data: dict):
     if user:
         if user.active:
             if user.verify_password(password):
+                print('a')
                 return encode(user.serialize_token())
+
+            else:
+                raise UnauthorizedException("Senha errada")
+
+        raise UnauthorizedException("Usuario desativado")
+
+    raise NotFoundException("Usuario não encontrado")
