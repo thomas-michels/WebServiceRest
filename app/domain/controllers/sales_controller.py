@@ -6,7 +6,7 @@ from app.domain.controllers.base_controller import get as base_get, \
                                                     delete as base_delete
 
 
-def create(db: Session):
+def create(db: Session) -> Sale:
     sale = Sale()
     db.add(sale)
     db.commit()
@@ -19,6 +19,10 @@ def get(db: Session):
 
 def get_by_id(db: Session, id: str):
     return base_get_by_id(db, Sale, id)
+
+
+def get_by_day(db: Session, day) -> Sale:
+    return db.query(Sale).filter_by(date=day).first()
 
 
 def update(db: Session, id: str, data: dict):
