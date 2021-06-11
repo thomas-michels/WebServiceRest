@@ -61,10 +61,10 @@ async def create_user(data: dict, db: Session = Depends(get_db)):
 
 
 @router.post("/salesman/", response_model=User, tags=['users'])
-async def create_salesman(data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+async def create_salesmans(data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
     authorization.check_authorization(db, token, route_type=ROUTE_CREATE, view=USERS_VIEW)
     try:
-        return JSONResponse(create_salesman(db, data))
+        return JSONResponse(create_salesman(db, data).serialize())
 
     except IntegrityError as e:
         raise UnprocessableEntityException(e.args[0])

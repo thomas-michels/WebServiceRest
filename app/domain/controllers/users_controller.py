@@ -23,7 +23,7 @@ def create(db: Session, data: dict) -> User:
 
 def create_salesman(db: Session, data: dict) -> User:
     user = create(db, data)
-    user.user_type = 2
+    user.user_type_id = 2
     db.commit()
     return user
 
