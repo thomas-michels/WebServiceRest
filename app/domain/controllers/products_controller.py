@@ -2,6 +2,7 @@ from typing import List
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.domain.models.products import Product
+from app.exceptions import NotFoundException
 from app.domain.controllers.base_controller import get as base_get, \
                                                     get_by_id as base_get_by_id,\
                                                     delete as base_delete
@@ -25,11 +26,19 @@ def get_by_id(db: Session, id: str) -> Product:
 
 
 def get_by_name(db: Session, name: str) -> Product:
-    return db.query(Product).filter_by(name=name).first()
+    product = db.query(Product).filter_by(name=name).first()
+    if not product:
+        raise NotFoundException('Produto não encontrado')
+
+    return product
 
 
 def get_by_price(db: Session, price: float) -> Product:
-    return db.query(Product).filter_by(price=price).all()
+    products = db.query(Product).filter_by(price=price).all()
+    if not products:
+        raise NotFoundException('Produto não encontrado')
+
+    return products
 
 
 def update(db: Session, id: str, data: dict) -> Product:

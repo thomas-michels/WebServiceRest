@@ -11,6 +11,8 @@ from database import get_db
 from app.domain.controllers.products_controller import get as product_get, \
                                                            create as product_create, \
                                                            get_by_id as product_get_by_id, \
+                                                           get_by_name as product_get_by_name, \
+                                                           get_by_price as product_get_by_price, \
                                                            update as product_update, \
                                                            delete as product_delete
 from utils.contants import ROUTE_DELETE, ROUTE_UPDATE, ROUTE_CREATE, ROUTE_GET
@@ -22,6 +24,20 @@ router = APIRouter()
 async def get_products(db: Session = Depends(get_db), token: str = Security(OAUTH2)):
     authorization.check_authorization(db, token, route_type=ROUTE_GET)
     json = jsonable_encoder(product_get(db))
+    return JSONResponse(json)
+
+
+@router.get("/name/{name}", response_model=List[Product], tags=['products'])
+async def get_products_by_name(name: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
+    json = jsonable_encoder(product_get_by_name(db, name))
+    return JSONResponse(json)
+
+
+@router.get("/price/{price}", response_model=List[Product], tags=['products'])
+async def get_products_by_price(price: float, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
+    authorization.check_authorization(db, token, route_type=ROUTE_GET)
+    json = jsonable_encoder(product_get_by_price(db, price))
     return JSONResponse(json)
 
 

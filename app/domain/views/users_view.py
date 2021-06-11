@@ -38,13 +38,13 @@ async def get_user(id: str, db: Session = Depends(get_db), token: str = Security
     return JSONResponse(user_get_by_id(db, id).serialize())
 
 
-@router.get("/email/", response_model=User, tags=['users'])
+@router.get("/email/{email}", response_model=User, tags=['users'])
 async def get_user_by_email(email: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
     authorization.check_authorization(db, token, route_type=ROUTE_GET, view=USERS_VIEW)
     return JSONResponse(user_get_email(db, email).serialize())
 
 
-@router.get("/name/", response_model=User, tags=['users'])
+@router.get("/name/{name}", response_model=User, tags=['users'])
 async def get_user_by_name(name: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
     authorization.check_authorization(db, token, name=name, route_type=ROUTE_GET, view=USERS_VIEW)
     return JSONResponse(user_get_name(db, name).serialize())
@@ -60,7 +60,7 @@ async def create_user(data: dict, db: Session = Depends(get_db)):
         raise UnprocessableEntityException(e.args[0])
 
 
-@router.post("/salesman", response_model=User, tags=['users'])
+@router.post("/salesman/", response_model=User, tags=['users'])
 async def create_salesman(data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
     authorization.check_authorization(db, token, route_type=ROUTE_CREATE, view=USERS_VIEW)
     try:
