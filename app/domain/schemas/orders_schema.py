@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class Order(BaseModel):
     id: str
+    user_id: str
     sale_id: str
     product_id: str
     quantity: float

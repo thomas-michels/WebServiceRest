@@ -24,6 +24,14 @@ def get_by_id(db: Session, id: str) -> Product:
     return base_get_by_id(db, Product, id)
 
 
+def get_by_name(db: Session, name: str) -> Product:
+    return db.query(Product).filter_by(name=name).first()
+
+
+def get_by_price(db: Session, price: float) -> Product:
+    return db.query(Product).filter_by(price=price).all()
+
+
 def update(db: Session, id: str, data: dict) -> Product:
     product = get_by_id(db, id)
     product.name = data.get('name') if data.get('name') else product.name
