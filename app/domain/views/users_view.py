@@ -12,40 +12,41 @@ from app.domain.services.security import OAUTH2
 from database import get_db
 from app.domain.services import authorization
 from app.exceptions import UnprocessableEntityException
-from utils.contants import ROUTE_UPDATE, ROUTE_DELETE, ROUTE_CREATE, ROUTE_GET
+from utils.contants import ROUTE_UPDATE, ROUTE_DELETE, ROUTE_CREATE, ROUTE_GET, USERS_VIEW
 from app.domain.controllers.users_controller import get as user_get, \
     create as user_create, \
     get_by_id as user_get_by_id, \
     update as user_update, \
     delete as user_delete, \
     get_by_email as user_get_email, \
-    get_by_name as user_get_name
+    get_by_name as user_get_name, \
+    create_salesman
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[User], tags=['users'])
 async def get_users(db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, route_type=ROUTE_GET)
+    authorization.check_authorization(db, token, route_type=ROUTE_GET, view=USERS_VIEW)
     json = jsonable_encoder(user_get(db))
     return JSONResponse(json)
 
 
 @router.get("/{id}", response_model=User, tags=['users'])
 async def get_user(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, route_type=ROUTE_GET)
+    authorization.check_authorization(db, token, route_type=ROUTE_GET, view=USERS_VIEW)
     return JSONResponse(user_get_by_id(db, id).serialize())
 
 
 @router.get("/email/", response_model=User, tags=['users'])
 async def get_user_by_email(email: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, route_type=ROUTE_GET)
+    authorization.check_authorization(db, token, route_type=ROUTE_GET, view=USERS_VIEW)
     return JSONResponse(user_get_email(db, email).serialize())
 
 
 @router.get("/name/", response_model=User, tags=['users'])
 async def get_user_by_name(name: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, name=name, route_type=ROUTE_GET)
+    authorization.check_authorization(db, token, name=name, route_type=ROUTE_GET, view=USERS_VIEW)
     return JSONResponse(user_get_name(db, name).serialize())
 
 
@@ -61,9 +62,9 @@ async def create_user(data: dict, db: Session = Depends(get_db)):
 
 @router.post("/salesman", response_model=User, tags=['users'])
 async def create_salesman(data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, route_type=ROUTE_CREATE)
+    authorization.check_authorization(db, token, route_type=ROUTE_CREATE, view=USERS_VIEW)
     try:
-        return JSONResponse(user_create(db, data).serialize())
+        return JSONResponse(create_salesman(db, data))
 
     except IntegrityError as e:
         raise UnprocessableEntityException(e.args[0])
@@ -71,11 +72,11 @@ async def create_salesman(data: dict, db: Session = Depends(get_db), token: str 
 
 @router.put("/{id}", response_model=User, tags=['users'])
 async def update_user(id: str, data: dict, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, route_type=ROUTE_UPDATE)
+    authorization.check_authorization(db, token, route_type=ROUTE_UPDATE, view=USERS_VIEW)
     return JSONResponse(user_update(db, id, data).serialize())
 
 
 @router.delete("/{id}", response_model=User, tags=['users'])
 async def delete_user(id: str, db: Session = Depends(get_db), token: str = Security(OAUTH2)):
-    authorization.check_authorization(db, token, route_type=ROUTE_DELETE)
+    authorization.check_authorization(db, token, route_type=ROUTE_DELETE, view=USERS_VIEW)
     return JSONResponse(user_delete(db, id).serialize())

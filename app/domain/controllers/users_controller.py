@@ -21,6 +21,13 @@ def create(db: Session, data: dict) -> User:
     return user
 
 
+def create_salesman(db: Session, data: dict) -> User:
+    user = create(db, data)
+    user.user_type = 2
+    db.commit()
+    return user
+
+
 def get(db: Session) -> List[User]:
     return base_get(db, User)
 
@@ -61,7 +68,6 @@ def login(db: Session, data: dict):
     if user:
         if user.active:
             if user.verify_password(password):
-                print('a')
                 return encode(user.serialize_token())
 
             else:
